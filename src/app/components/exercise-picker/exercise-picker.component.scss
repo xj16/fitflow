@@ -1,0 +1,21 @@
+.group-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px 12px;
+
+  ion-chip {
+    text-transform: capitalize;
+    margin: 0;
+  }
+}
+
+.no-results {
+  text-align: center;
+  color: var(--ion-color-medium);
+  padding: 32px 16px;
+}
+
+.create-wrap {
+  padding: 8px 16px 24px;
+}

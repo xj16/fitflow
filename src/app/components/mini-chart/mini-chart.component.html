@@ -1,0 +1,46 @@
+@if (hasData()) {
+  <svg [attr.viewBox]="viewBox" class="mini-chart" preserveAspectRatio="none">
+    <defs>
+      <linearGradient [attr.id]="'grad-' + color()" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" [attr.stop-color]="color()" stop-opacity="0.35" />
+        <stop offset="100%" [attr.stop-color]="color()" stop-opacity="0" />
+      </linearGradient>
+    </defs>
+
+    @if (type() === 'line') {
+      <path
+        class="area"
+        [attr.d]="areaPath()"
+        [attr.fill]="'url(#grad-' + color() + ')'"
+      ></path>
+      <polyline
+        class="line"
+        [attr.points]="linePath()"
+        [attr.stroke]="color()"
+      ></polyline>
+      @for (c of coords(); track $index) {
+        <circle
+          class="dot"
+          [attr.cx]="c.x"
+          [attr.cy]="c.y"
+          r="2.5"
+          [attr.fill]="color()"
+        ></circle>
+      }
+    } @else {
+      @for (b of bars(); track $index) {
+        <rect
+          class="bar"
+          [attr.x]="b.x"
+          [attr.y]="b.y"
+          [attr.width]="b.w"
+          [attr.height]="b.h"
+          [attr.fill]="color()"
+          rx="2"
+        ></rect>
+      }
+    }
+  </svg>
+} @else {
+  <div class="chart-empty">Not enough data yet</div>
+}

@@ -1,0 +1,142 @@
+.workout-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px 4px;
+  flex-wrap: wrap;
+
+  ion-segment {
+    max-width: 140px;
+  }
+}
+
+.rest-control {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+
+  .rest-label {
+    font-size: 0.8rem;
+    color: var(--ion-color-medium);
+    margin-right: 4px;
+  }
+
+  .rest-value {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    min-width: 42px;
+    text-align: center;
+  }
+}
+
+.volume-banner {
+  padding: 4px 16px 12px;
+  font-size: 0.9rem;
+  color: var(--ion-color-medium);
+
+  strong {
+    color: var(--ion-color-primary);
+  }
+}
+
+.exercise-card {
+  margin: 10px 12px 16px;
+  border-radius: 16px;
+}
+
+.exercise-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  ion-card-title {
+    font-size: 1.1rem;
+  }
+}
+
+.set-grid {
+  display: grid;
+  grid-template-columns: 40px 1fr 1fr 52px 44px;
+  align-items: center;
+  gap: 6px;
+
+  &.header-row {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ion-color-medium);
+    padding: 4px 0;
+    border-bottom: 1px solid var(--ion-color-step-150, #e0e0e0);
+  }
+
+  &.data-row {
+    padding: 2px 0;
+    border-bottom: 1px solid var(--ion-color-step-100, #f0f0f0);
+    transition: background 0.25s ease;
+
+    &.is-done {
+      background: rgba(46, 204, 113, 0.12);
+      border-radius: 8px;
+    }
+
+    &.is-warmup {
+      opacity: 0.7;
+    }
+  }
+
+  .col-set {
+    text-align: center;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .col-1rm {
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.85rem;
+    color: var(--ion-color-primary);
+  }
+
+  ion-input {
+    --padding-top: 6px;
+    --padding-bottom: 6px;
+    --padding-start: 8px;
+    --padding-end: 4px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    background: var(--ion-color-step-50, #f7f7f7);
+    border-radius: 8px;
+    min-height: 36px;
+  }
+
+  ion-checkbox {
+    margin: 0 auto;
+  }
+}
+
+.set-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.add-exercise-wrap {
+  padding: 4px 16px 8px;
+}
+
+.bottom-spacer {
+  height: 120px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px 24px;
+  color: var(--ion-color-medium);
+
+  ion-icon {
+    font-size: 64px;
+  }
+}

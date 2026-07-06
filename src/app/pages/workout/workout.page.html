@@ -1,0 +1,138 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/history" text="Log"></ion-back-button>
+    </ion-buttons>
+    <ion-title (click)="renameWorkout()">
+      {{ workout()?.title || 'Workout' }}
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="finish()" strong="true">Finish</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (workout(); as w) {
+    <div class="workout-meta">
+      <ion-segment
+        [value]="w.unit"
+        (ionChange)="setUnit($any($event).detail.value)"
+      >
+        <ion-segment-button value="kg"><ion-label>kg</ion-label></ion-segment-button>
+        <ion-segment-button value="lb"><ion-label>lb</ion-label></ion-segment-button>
+      </ion-segment>
+
+      <div class="rest-control">
+        <span class="rest-label">Rest</span>
+        <ion-button size="small" fill="clear" (click)="bumpRest(-15)">−15s</ion-button>
+        <span class="rest-value">{{ restLabel() }}</span>
+        <ion-button size="small" fill="clear" (click)="bumpRest(15)">+15s</ion-button>
+      </div>
+    </div>
+
+    <div class="volume-banner">
+      Session volume:
+      <strong>{{ totalVolume() | number: '1.0-0' }} {{ w.unit }}</strong>
+    </div>
+
+    @for (entry of w.exercises; track entry.id) {
+      <ion-card class="exercise-card">
+        <ion-card-header>
+          <div class="exercise-header">
+            <ion-card-title>{{ entry.name }}</ion-card-title>
+            <ion-button fill="clear" size="small" (click)="removeEntry(entry)">
+              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+            </ion-button>
+          </div>
+          <ion-note color="medium">
+            Vol {{ entryVolume(entry) | number: '1.0-0' }} {{ w.unit }}
+            @if (entryBest1RM(entry) > 0) {
+              · est 1RM {{ entryBest1RM(entry) | number: '1.0-1' }} {{ w.unit }}
+            }
+          </ion-note>
+        </ion-card-header>
+
+        <ion-card-content>
+          <div class="set-grid header-row">
+            <span class="col-set">Set</span>
+            <span class="col-weight">Weight</span>
+            <span class="col-reps">Reps</span>
+            <span class="col-1rm">1RM</span>
+            <span class="col-done">✓</span>
+          </div>
+
+          @for (set of entry.sets; track set.id; let i = $index) {
+            <div class="set-grid data-row" [class.is-done]="set.done" [class.is-warmup]="set.warmup">
+              <span class="col-set" (click)="toggleWarmup(entry, set)">
+                @if (set.warmup) { W } @else { {{ i + 1 }} }
+              </span>
+              <ion-input
+                class="col-weight"
+                type="number"
+                inputmode="decimal"
+                [value]="set.weight || ''"
+                placeholder="0"
+                (ionInput)="updateSetField(entry, set, 'weight', $any($event).detail.value)"
+              ></ion-input>
+              <ion-input
+                class="col-reps"
+                type="number"
+                inputmode="numeric"
+                [value]="set.reps || ''"
+                placeholder="0"
+                (ionInput)="updateSetField(entry, set, 'reps', $any($event).detail.value)"
+              ></ion-input>
+              <span class="col-1rm">
+                @if (setEstimate(set) > 0) {
+                  {{ setEstimate(set) | number: '1.0-0' }}
+                } @else {
+                  —
+                }
+              </span>
+              <ion-checkbox
+                class="col-done"
+                [checked]="set.done"
+                (ionChange)="toggleDone(entry, set)"
+              ></ion-checkbox>
+            </div>
+          }
+
+          <div class="set-actions">
+            <ion-button fill="clear" size="small" (click)="addSet(entry)">
+              <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+              Add set
+            </ion-button>
+            @if (entry.sets.length > 1) {
+              <ion-button
+                fill="clear"
+                size="small"
+                color="medium"
+                (click)="removeSet(entry, entry.sets[entry.sets.length - 1])"
+              >
+                <ion-icon slot="start" name="remove-circle-outline"></ion-icon>
+                Remove
+              </ion-button>
+            }
+          </div>
+        </ion-card-content>
+      </ion-card>
+    }
+
+    <div class="add-exercise-wrap">
+      <ion-button expand="block" fill="outline" (click)="addExercise()">
+        <ion-icon slot="start" name="barbell-outline"></ion-icon>
+        Add Exercise
+      </ion-button>
+    </div>
+
+    <div class="bottom-spacer"></div>
+  } @else {
+    <div class="empty-state">
+      <ion-icon name="barbell-outline"></ion-icon>
+      <h2>Workout not found</h2>
+    </div>
+  }
+
+  <app-rest-timer></app-rest-timer>
+</ion-content>

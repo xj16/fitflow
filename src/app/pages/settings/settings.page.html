@@ -1,0 +1,150 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Settings</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Settings</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Storage</ion-label>
+    </ion-list-header>
+    <ion-item>
+      <ion-icon slot="start" name="cloud-offline-outline" color="primary"></ion-icon>
+      <ion-label>
+        <h2>Offline backend</h2>
+        <ion-note color="medium">
+          Data is stored on-device via <strong>{{ backend }}</strong>. Works with no network.
+        </ion-note>
+      </ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-label>Workouts</ion-label>
+      <ion-badge slot="end" color="primary">{{ workoutCount() }}</ion-badge>
+    </ion-item>
+    <ion-item>
+      <ion-label>Exercises</ion-label>
+      <ion-badge slot="end" color="primary">{{ exerciseCount() }}</ion-badge>
+    </ion-item>
+    <ion-item>
+      <ion-label>Routines</ion-label>
+      <ion-badge slot="end" color="primary">{{ routineCount() }}</ion-badge>
+    </ion-item>
+    <ion-item button (click)="exportData()">
+      <ion-icon slot="start" name="save-outline" color="medium"></ion-icon>
+      <ion-label>Export data (JSON backup)</ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Cloud sync (optional)</ion-label>
+    </ion-list-header>
+
+    <ion-item>
+      <ion-select
+        label="Backend"
+        [value]="provider()"
+        (ionChange)="provider.set($any($event).detail.value)"
+        interface="popover"
+      >
+        <ion-select-option value="none">None (offline only)</ion-select-option>
+        <ion-select-option value="supabase">Supabase (self-hosted)</ion-select-option>
+        <ion-select-option value="firebase">Firebase (alternative)</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    @if (provider() === 'supabase') {
+      <ion-item>
+        <ion-input
+          label="Project URL"
+          labelPlacement="stacked"
+          placeholder="https://xyz.supabase.co"
+          [value]="supabaseUrl()"
+          (ionInput)="supabaseUrl.set($any($event).detail.value)"
+        ></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input
+          label="Anon public key"
+          labelPlacement="stacked"
+          type="password"
+          placeholder="eyJhbGciOi..."
+          [value]="supabaseAnonKey()"
+          (ionInput)="supabaseAnonKey.set($any($event).detail.value)"
+        ></ion-input>
+      </ion-item>
+      <ion-item lines="none">
+        <ion-note color="medium">
+          Use your OWN Supabase project (free tier or self-hosted). Run
+          <code>supabase/schema.sql</code> once to create the tables.
+        </ion-note>
+      </ion-item>
+    }
+
+    @if (provider() === 'firebase') {
+      <ion-item>
+        <ion-input
+          label="Realtime DB URL"
+          labelPlacement="stacked"
+          placeholder="https://xyz.firebaseio.com"
+          [value]="firebaseDbUrl()"
+          (ionInput)="firebaseDbUrl.set($any($event).detail.value)"
+        ></ion-input>
+      </ion-item>
+    }
+
+    @if (provider() !== 'none') {
+      <ion-item>
+        <ion-toggle
+          [checked]="autoSync()"
+          (ionChange)="autoSync.set($any($event).detail.checked)"
+        >
+          Auto-sync after changes
+        </ion-toggle>
+      </ion-item>
+    }
+
+    <ion-item lines="none">
+      <ion-label>Status</ion-label>
+      <ion-badge slot="end" [color]="statusColor()">{{ syncStatus() }}</ion-badge>
+    </ion-item>
+
+    @if (lastSyncedAt()) {
+      <ion-item lines="none">
+        <ion-note color="medium">
+          Last synced {{ lastSyncedAt() | date: 'MMM d, h:mm a' }}
+        </ion-note>
+      </ion-item>
+    }
+    @if (lastError()) {
+      <ion-item lines="none">
+        <ion-note color="danger">{{ lastError() }}</ion-note>
+      </ion-item>
+    }
+
+    <div class="sync-actions">
+      <ion-button expand="block" (click)="saveAndSync()">
+        <ion-icon slot="start" name="save-outline"></ion-icon>
+        Save & sync
+      </ion-button>
+      @if (provider() !== 'none') {
+        <ion-button expand="block" fill="outline" (click)="syncNow()">
+          <ion-icon slot="start" name="refresh-outline"></ion-icon>
+          Sync now
+        </ion-button>
+      }
+    </div>
+  </ion-list>
+
+  <div class="about">
+    <p>FitFlow — offline-first workout tracker.</p>
+    <p>MIT licensed · built with Ionic + Angular + Capacitor.</p>
+  </div>
+</ion-content>

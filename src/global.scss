@@ -1,0 +1,159 @@
+/*
+ * Global app styles shared across pages. Component-scoped styles live in each
+ * component's .scss; this file holds cross-cutting patterns (brand mark, empty
+ * states, summary cards) so pages stay consistent.
+ */
+
+.brand {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, #5b6cff, #7b5bff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 72px 28px;
+  color: var(--ion-color-medium);
+
+  ion-icon {
+    font-size: 64px;
+    margin-bottom: 8px;
+    color: var(--ion-color-primary);
+    opacity: 0.7;
+  }
+
+  h2 {
+    margin: 8px 0 6px;
+    font-weight: 600;
+    color: var(--ion-text-color);
+  }
+
+  p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+}
+
+.summary-card {
+  display: flex;
+  gap: 12px;
+  margin: 12px 16px 4px;
+
+  .summary-metric {
+    flex: 1;
+    background: var(--ion-color-step-50, #f4f5f8);
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+
+    .value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--ion-color-primary);
+    }
+
+    .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ion-color-medium);
+    }
+  }
+}
+
+// Stats page helpers.
+.picker-item {
+  --padding-start: 0;
+  margin-bottom: 8px;
+}
+
+.chart-caption {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.85rem;
+
+  strong {
+    color: var(--ion-color-success);
+  }
+}
+
+.pr-content {
+  padding-inline: 0;
+}
+
+.pr-badge {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(135deg, #5b6cff, #7b5bff);
+  color: #fff;
+  border-radius: 10px;
+  padding: 6px 10px;
+  min-width: 44px;
+  text-align: center;
+}
+
+ion-card-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  ion-icon {
+    color: var(--ion-color-warning);
+  }
+}
+
+// Routines page.
+.days-card {
+  margin: 4px 12px 18px;
+
+  .day-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+
+    & + .day-row {
+      border-top: 1px solid var(--ion-color-step-100, #f0f0f0);
+    }
+
+    .day-info {
+      display: flex;
+      flex-direction: column;
+
+      .day-name {
+        font-weight: 600;
+      }
+
+      .day-detail {
+        font-size: 0.8rem;
+        color: var(--ion-color-medium);
+      }
+    }
+  }
+}
+
+// Settings page.
+.sync-actions {
+  padding: 12px 16px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.about {
+  text-align: center;
+  padding: 24px 16px 40px;
+  color: var(--ion-color-medium);
+  font-size: 0.8rem;
+
+  p {
+    margin: 2px 0;
+  }
+}

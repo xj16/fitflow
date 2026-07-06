@@ -1,0 +1,98 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Stats</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Stats</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  @if (workouts().length === 0) {
+    <div class="empty-state">
+      <ion-icon name="stats-chart-outline"></ion-icon>
+      <h2>No data yet</h2>
+      <p>Log a few workouts and your PRs, volume trends and 1RM charts will appear here automatically.</p>
+    </div>
+  } @else {
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Weekly volume</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <app-mini-chart
+          [points]="weekly()"
+          type="bar"
+          color="#5b6cff"
+        ></app-mini-chart>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Estimated 1RM progression</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item lines="none" class="picker-item">
+          <ion-select
+            label="Exercise"
+            interface="popover"
+            [value]="effectiveExerciseId()"
+            (ionChange)="onSelectExercise($any($event).detail.value)"
+          >
+            @for (ex of trackedExercises(); track ex.exerciseId) {
+              <ion-select-option [value]="ex.exerciseId">
+                {{ ex.name }}
+              </ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+
+        <app-mini-chart
+          [points]="oneRmSeries()"
+          type="line"
+          color="#22c55e"
+          unit="kg"
+        ></app-mini-chart>
+
+        @if (oneRmSeries().length > 0) {
+          <ion-note color="medium" class="chart-caption">
+            {{ selectedName() }} — latest est. 1RM
+            <strong>{{ oneRmSeries()[oneRmSeries().length - 1].value | number: '1.0-1' }}</strong>
+          </ion-note>
+        }
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="trophy-outline"></ion-icon>
+          Personal Records
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content class="pr-content">
+        <ion-list>
+          @for (pr of prs(); track pr.exerciseId) {
+            <ion-item lines="full">
+              <ion-label>
+                <h2>{{ pr.exerciseName }}</h2>
+                <ion-note color="medium">
+                  Best set {{ pr.maxWeight | number: '1.0-1' }} ·
+                  est 1RM {{ pr.bestEstimated1RM | number: '1.0-1' }} ·
+                  {{ pr.achievedAt | date: 'MMM d' }}
+                </ion-note>
+              </ion-label>
+              <div slot="end" class="pr-badge">
+                {{ pr.bestEstimated1RM | number: '1.0-0' }}
+              </div>
+            </ion-item>
+          }
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+  }
+</ion-content>

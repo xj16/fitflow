@@ -1,0 +1,31 @@
+@if (timer.running()) {
+  <div class="rest-timer-overlay" [class.urgent]="urgent()">
+    <div class="ring-wrap">
+      <svg viewBox="0 0 80 80" class="ring">
+        <circle class="ring-track" cx="40" cy="40" r="34"></circle>
+        <circle
+          class="ring-progress"
+          cx="40"
+          cy="40"
+          r="34"
+          [style.stroke-dasharray]="circumference"
+          [style.stroke-dashoffset]="dashOffset()"
+        ></circle>
+      </svg>
+      <div class="ring-label">
+        <span class="time">{{ timer.display() }}</span>
+        <span class="caption">rest</span>
+      </div>
+    </div>
+
+    <div class="rest-actions">
+      <ion-button size="small" fill="clear" color="light" (click)="addTime()">
+        <ion-icon slot="start" name="add-outline"></ion-icon>
+        15s
+      </ion-button>
+      <ion-button size="small" fill="clear" color="light" (click)="skip()">
+        Skip
+      </ion-button>
+    </div>
+  </div>
+}

@@ -1,0 +1,61 @@
+.meta-list {
+  margin-bottom: 12px;
+}
+
+.day-card {
+  margin: 0 0 14px;
+}
+
+.day-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .day-name-input {
+    font-weight: 600;
+    font-size: 1.05rem;
+  }
+}
+
+.slot {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ion-color-step-100, #f0f0f0);
+}
+
+.slot-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .slot-name {
+    font-weight: 500;
+  }
+}
+
+.slot-fields {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.7rem;
+    color: var(--ion-color-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+
+    ion-input {
+      --padding-start: 6px;
+      --padding-end: 6px;
+      --padding-top: 4px;
+      --padding-bottom: 4px;
+      background: var(--ion-color-step-50, #f7f7f7);
+      border-radius: 6px;
+      margin-top: 2px;
+      text-align: center;
+      font-size: 0.95rem;
+      color: var(--ion-text-color);
+    }
+  }
+}

@@ -1,0 +1,73 @@
+// FitFlow theme — a calm indigo/violet palette with a green "done"/PR accent.
+// Ionic reads these CSS custom properties to theme every component.
+
+:root {
+  --ion-color-primary: #5b6cff;
+  --ion-color-primary-rgb: 91, 108, 255;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #505fe0;
+  --ion-color-primary-tint: #6b7bff;
+
+  --ion-color-secondary: #7b5bff;
+  --ion-color-secondary-rgb: 123, 91, 255;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #6c50e0;
+  --ion-color-secondary-tint: #886bff;
+
+  --ion-color-success: #22c55e;
+  --ion-color-success-rgb: 34, 197, 94;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #1ead52;
+  --ion-color-success-tint: #38cb6e;
+
+  --ion-color-warning: #f5a623;
+  --ion-color-warning-rgb: 245, 166, 35;
+  --ion-color-warning-contrast: #000000;
+  --ion-color-warning-contrast-rgb: 0, 0, 0;
+  --ion-color-warning-shade: #d8921f;
+  --ion-color-warning-tint: #f6af39;
+
+  --ion-color-danger: #ef4444;
+  --ion-color-danger-rgb: 239, 68, 68;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #d23c3c;
+  --ion-color-danger-tint: #f15757;
+
+  --ion-color-medium: #8a8f98;
+  --ion-color-medium-rgb: 138, 143, 152;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #797e86;
+  --ion-color-medium-tint: #969ba3;
+
+  --ion-color-light: #f4f5f8;
+  --ion-color-light-rgb: 244, 245, 248;
+  --ion-color-light-contrast: #000000;
+  --ion-color-light-contrast-rgb: 0, 0, 0;
+  --ion-color-light-shade: #d7d8da;
+  --ion-color-light-tint: #f5f6f9;
+}
+
+// Dark mode: honour the OS preference automatically.
+@media (prefers-color-scheme: dark) {
+  body {
+    --ion-background-color: #12131a;
+    --ion-background-color-rgb: 18, 19, 26;
+    --ion-text-color: #f1f2f6;
+    --ion-text-color-rgb: 241, 242, 246;
+
+    --ion-color-step-50: #1c1d26;
+    --ion-color-step-100: #23242f;
+    --ion-color-step-150: #2b2c38;
+    --ion-color-step-200: #333441;
+
+    --ion-card-background: #1a1b24;
+    --ion-item-background: #1a1b24;
+    --ion-toolbar-background: #16171f;
+    --ion-tab-bar-background: #16171f;
+  }
+}

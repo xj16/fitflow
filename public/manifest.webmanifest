@@ -1,0 +1,17 @@
+{
+  "name": "FitFlow",
+  "short_name": "FitFlow",
+  "description": "Offline-first workout tracker",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#12131a",
+  "theme_color": "#5b6cff",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

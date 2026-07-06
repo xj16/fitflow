@@ -1,0 +1,62 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Add Exercise</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancel()">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="Search exercises"
+      [debounce]="150"
+      (ionInput)="onSearch($any($event).detail.value)"
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="group-chips">
+    <ion-chip
+      [outline]="groupFilter() !== 'all'"
+      color="primary"
+      (click)="setGroup('all')"
+    >
+      all
+    </ion-chip>
+    @for (g of groups; track g) {
+      <ion-chip
+        [outline]="groupFilter() !== g"
+        color="primary"
+        (click)="setGroup(g)"
+      >
+        {{ g }}
+      </ion-chip>
+    }
+  </div>
+
+  <ion-list>
+    @for (ex of filtered(); track ex.id) {
+      <ion-item button (click)="pick(ex)">
+        <ion-label>
+          <h2>{{ ex.name }}</h2>
+          <ion-note color="medium">{{ ex.muscleGroup }} · {{ ex.equipment }}</ion-note>
+        </ion-label>
+        <ion-icon slot="end" name="chevron-forward-outline" color="medium"></ion-icon>
+      </ion-item>
+    }
+    @if (filtered().length === 0) {
+      <div class="no-results">
+        <p>No exercises match "{{ query() }}".</p>
+      </div>
+    }
+  </ion-list>
+
+  <div class="create-wrap">
+    <ion-button expand="block" fill="outline" (click)="createNew()">
+      <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+      Create new exercise
+    </ion-button>
+  </div>
+</ion-content>
