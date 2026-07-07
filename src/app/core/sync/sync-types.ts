@@ -22,8 +22,17 @@ export interface SyncBackend {
   readonly name: string;
   /** True when credentials/config are present and the backend is reachable. */
   isConfigured(): boolean;
-  /** Pull all remote records for a collection. */
-  pull<T extends Syncable>(collection: SyncCollection): Promise<T[]>;
+  /**
+   * Pull remote records for a collection. When `since` is provided (an ISO-8601
+   * timestamp), the backend returns only records with `updated_at > since` — an
+   * incremental delta sync that uses the `updated_at` index instead of
+   * re-downloading the entire history on every run. Omitting `since` performs a
+   * full pull (used on first sync or when no high-water mark is stored yet).
+   */
+  pull<T extends Syncable>(
+    collection: SyncCollection,
+    since?: string | null,
+  ): Promise<T[]>;
   /** Upsert the given records into a collection. */
   push<T extends Syncable>(
     collection: SyncCollection,

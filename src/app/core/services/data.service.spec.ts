@@ -87,4 +87,73 @@ describe('DataService', () => {
     expect(service.exercises().length).toBe(before + 1);
     expect(created.id).toBeTruthy();
   });
+
+  // ---- Demo mode --------------------------------------------------------
+
+  it('seeds demo history only when there is no data', async () => {
+    expect(service.hasData()).toBeFalse();
+    const seeded = await service.loadDemoData(6);
+    expect(seeded).toBeTrue();
+    expect(service.workouts().length).toBeGreaterThan(0);
+    expect(service.hasData()).toBeTrue();
+
+    // Second call is a no-op — never clobbers existing history.
+    const seededAgain = await service.loadDemoData(6);
+    expect(seededAgain).toBeFalse();
+  });
+
+  // ---- Import / export --------------------------------------------------
+
+  it('produces a versioned, self-describing export', async () => {
+    await service.createWorkout('Exported');
+    const dump = service.buildExport();
+    expect(dump.app).toBe('fitflow');
+    expect(dump.schemaVersion).toBeGreaterThanOrEqual(1);
+    expect(dump.workouts.length).toBe(1);
+    expect(typeof dump.exportedAt).toBe('string');
+  });
+
+  it('imports a backup by last-write-wins merge, not blind overwrite', async () => {
+    // Local edit that is NEWER than the imported copy must survive.
+    const w = await service.createWorkout('Local Newer');
+    await service.updateWorkout(w.id, { title: 'Local Newer v2' });
+
+    const stale = {
+      ...w,
+      title: 'Stale Import',
+      updatedAt: '2000-01-01T00:00:00.000Z',
+    };
+    const brandNew = {
+      id: 'imported-1',
+      date: '2026-01-01T00:00:00.000Z',
+      title: 'Imported Session',
+      unit: 'kg' as const,
+      exercises: [],
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+    };
+
+    const summary = await service.importData({
+      app: 'fitflow',
+      workouts: [stale, brandNew],
+    });
+
+    // The stale import lost to the newer local edit.
+    expect(service.getWorkout(w.id)?.title).toBe('Local Newer v2');
+    // The brand-new record was pulled in.
+    expect(service.getWorkout('imported-1')).toBeDefined();
+    expect(summary.workouts).toBe(1); // one net-new record pulled
+  });
+
+  it('rejects a non-FitFlow payload', async () => {
+    await expectAsync(
+      service.importData({ app: 'somethingelse', workouts: [] }),
+    ).toBeRejectedWithError(/Not a FitFlow backup/);
+  });
+
+  it('rejects a payload with no recognizable collections', async () => {
+    await expectAsync(service.importData({ app: 'fitflow' })).toBeRejectedWithError(
+      /no recognizable data/,
+    );
+  });
 });

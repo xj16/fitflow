@@ -1,9 +1,18 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, signal } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 
 export interface ChartPoint {
   /** X label, e.g. a short date. */
   label: string;
   value: number;
+}
+
+/** A resolved on-screen point plus its source datum, for tooltips. */
+export interface ChartCoord {
+  x: number;
+  y: number;
+  value: number;
+  label: string;
 }
 
 /**
@@ -17,6 +26,7 @@ export interface ChartPoint {
 @Component({
   selector: 'app-mini-chart',
   standalone: true,
+  imports: [DecimalPipe],
   templateUrl: './mini-chart.component.html',
   styleUrl: './mini-chart.component.scss',
 })
@@ -43,11 +53,46 @@ export class MiniChartComponent {
     return vals.length ? Math.min(...vals) : 0;
   });
 
+  readonly width_ = this.width;
+  readonly height_ = this.height;
+
+  /** Index of the point the user is hovering / has tapped, or null. */
+  readonly activeIndex = signal<number | null>(null);
+
+  /** The currently highlighted coordinate for the tooltip, if any. */
+  readonly activeCoord = computed<ChartCoord | null>(() => {
+    const i = this.activeIndex();
+    const cs = this.coords();
+    return i !== null && i >= 0 && i < cs.length ? cs[i] : null;
+  });
+
+  /** Horizontal anchor for the tooltip, clamped so it stays in view. */
+  readonly tooltipX = computed(() => {
+    const c = this.activeCoord();
+    if (!c) {
+      return 0;
+    }
+    return Math.min(this.width - 60, Math.max(4, c.x - 30));
+  });
+
+  setActive(i: number | null): void {
+    this.activeIndex.set(i);
+  }
+
+  /** Half-width of each point's invisible hover/tap hit target. */
+  readonly hitHalf = computed(() => {
+    const n = this.points().length;
+    if (n <= 1) {
+      return (this.width - this.padX * 2) / 2;
+    }
+    return (this.width - this.padX * 2) / (n - 1) / 2;
+  });
+
   /** Screen coordinates for each data point. */
-  readonly coords = computed(() => {
+  readonly coords = computed<ChartCoord[]>(() => {
     const pts = this.points();
     if (pts.length === 0) {
-      return [] as Array<{ x: number; y: number; value: number; label: string }>;
+      return [];
     }
     const max = this.maxValue();
     const min = Math.min(this.minValue(), max * 0.9);

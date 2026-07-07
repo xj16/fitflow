@@ -24,16 +24,40 @@ export class FirebaseBackend implements SyncBackend {
     return this.databaseUrl.length > 0;
   }
 
-  async pull<T extends Syncable>(collection: SyncCollection): Promise<T[]> {
+  async pull<T extends Syncable>(
+    collection: SyncCollection,
+    since?: string | null,
+  ): Promise<T[]> {
     if (!this.isConfigured()) {
       throw new Error('Firebase backend is not configured');
     }
-    const res = await fetch(`${this.databaseUrl}/${collection}.json`);
+    // Incremental delta sync: Firebase RTDB supports server-side range queries
+    // via orderBy + startAt over the REST API. We use `startAt` (inclusive, and
+    // universally supported across REST versions) and rely on the strict
+    // client-side `> since` filter below to drop the boundary record — this is
+    // more robust than `startAfter`, which some REST versions reject with 400.
+    // (Requires an `.indexOn: ["updatedAt"]` rule on the node; without it
+    // Firebase returns everything and we filter client-side.)
+    let url = `${this.databaseUrl}/${collection}.json`;
+    if (since) {
+      const params = new URLSearchParams({
+        orderBy: '"updatedAt"',
+        startAt: `"${since}"`,
+      });
+      url = `${url}?${params.toString()}`;
+    }
+    const res = await fetch(url);
     if (!res.ok) {
       throw new Error(`Firebase pull failed: ${res.status} ${res.statusText}`);
     }
     const body = (await res.json()) as Record<string, T> | null;
-    return body ? Object.values(body) : [];
+    if (!body) {
+      return [];
+    }
+    const rows = Object.values(body);
+    // Defensive client-side filter in case the node has no index rule and
+    // Firebase ignored the query (it then returns the whole collection).
+    return since ? rows.filter((r) => r.updatedAt > since) : rows;
   }
 
   async push<T extends Syncable>(

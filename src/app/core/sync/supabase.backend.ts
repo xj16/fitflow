@@ -37,13 +37,21 @@ export class SupabaseBackend implements SyncBackend {
     return collection;
   }
 
-  async pull<T extends Syncable>(collection: SyncCollection): Promise<T[]> {
+  async pull<T extends Syncable>(
+    collection: SyncCollection,
+    since?: string | null,
+  ): Promise<T[]> {
     if (!this.client) {
       throw new Error('Supabase backend is not configured');
     }
-    const { data, error } = await this.client
-      .from(this.table(collection))
-      .select('data');
+    // Incremental delta sync: when we have a high-water mark, only fetch rows
+    // changed since then, using the `updated_at` index schema.sql creates. On
+    // the first sync (no mark) we fall back to a full pull.
+    let query = this.client.from(this.table(collection)).select('data');
+    if (since) {
+      query = query.gt('updated_at', since);
+    }
+    const { data, error } = await query;
     if (error) {
       throw new Error(`Supabase pull failed: ${error.message}`);
     }

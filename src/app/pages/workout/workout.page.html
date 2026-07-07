@@ -31,6 +31,16 @@
       </div>
     </div>
 
+    <div class="session-date" (click)="editDate()">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <span>{{ w.date | date: 'EEE, MMM d · h:mm a' }}</span>
+      @if (durationLabel()) {
+        <span class="dot-sep">·</span>
+        <span>{{ durationLabel() }}</span>
+      }
+      <ion-icon class="edit-hint" name="create-outline"></ion-icon>
+    </div>
+
     <div class="volume-banner">
       Session volume:
       <strong>{{ totalVolume() | number: '1.0-0' }} {{ w.unit }}</strong>

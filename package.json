@@ -1,6 +1,6 @@
 {
   "name": "fitflow",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Offline-first workout tracker built with Ionic + Angular. Log workouts, track PRs and progressive-overload routines, fully offline with optional Supabase sync.",
   "author": "xj16",
   "license": "MIT",
@@ -17,6 +17,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test --watch=false --browsers=ChromeHeadless",
     "test:ci": "ng test --watch=false --browsers=ChromeHeadlessNoSandbox",
+    "test:coverage": "node scripts/coverage.mjs",
+    "build:demo": "ng build --configuration demo && node scripts/prepare-demo.mjs",
     "lint": "ng lint"
   },
   "private": true,
@@ -27,6 +29,7 @@
     "@angular/forms": "^22.0.0",
     "@angular/platform-browser": "^22.0.0",
     "@angular/router": "^22.0.0",
+    "@angular/service-worker": "^22.0.5",
     "@capacitor/app": "^8.0.0",
     "@capacitor/core": "^8.0.0",
     "@capacitor/haptics": "^8.0.0",

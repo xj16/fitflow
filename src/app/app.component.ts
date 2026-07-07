@@ -78,5 +78,22 @@ export class AppComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     await this.data.init();
     await this.sync.init();
+    await this.maybeSeedDemo();
+  }
+
+  /**
+   * Auto-seed demo history when the app is opened with `?demo=1` (used by the
+   * live portfolio demo and shareable links) so the Stats/PR/chart views come
+   * up fully populated. No-op if there is already data, so it never overwrites
+   * a real user's history.
+   */
+  private async maybeSeedDemo(): Promise<void> {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('demo') === '1') {
+      await this.data.loadDemoData();
+    }
   }
 }

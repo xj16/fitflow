@@ -72,6 +72,8 @@ export class SettingsPage {
   readonly syncStatus = this.sync.status;
   readonly lastSyncedAt = this.sync.lastSyncedAt;
   readonly lastError = this.sync.lastError;
+  readonly pendingChanges = this.sync.pendingChanges;
+  readonly hasData = this.data.hasData;
 
   // Local editable copy of the sync config.
   readonly provider = signal<SyncConfig['provider']>('none');
@@ -130,13 +132,7 @@ export class SettingsPage {
   }
 
   async exportData(): Promise<void> {
-    const payload = {
-      exportedAt: new Date().toISOString(),
-      workouts: this.data.rawWorkouts(),
-      exercises: this.data.rawExercises(),
-      routines: this.data.rawRoutines(),
-    };
-    const json = JSON.stringify(payload, null, 2);
+    const json = JSON.stringify(this.data.buildExport(), null, 2);
     try {
       const blob = new Blob([json], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -155,6 +151,45 @@ export class SettingsPage {
       });
       await alert.present();
     }
+  }
+
+  /**
+   * Import a JSON backup via a file picker. The chosen file is parsed and
+   * reconciled into local data with the last-write-wins merge engine (never a
+   * blind overwrite), so importing on a device with existing history is safe.
+   */
+  importData(): void {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json,.json';
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) {
+        return;
+      }
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        const summary = await this.data.importData(parsed);
+        await this.toast(
+          `Imported ${summary.workouts} workouts, ${summary.exercises} exercises, ${summary.routines} routines.`,
+        );
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Invalid file.';
+        await this.toast(`Import failed: ${msg}`);
+      }
+    };
+    input.click();
+  }
+
+  /** One-tap seed of ~12 weeks of realistic demo history. */
+  async loadDemo(): Promise<void> {
+    const seeded = await this.data.loadDemoData();
+    await this.toast(
+      seeded
+        ? 'Loaded 12 weeks of demo history — check the Stats tab.'
+        : 'You already have workouts; demo data was skipped.',
+    );
   }
 
   private async toast(message: string): Promise<void> {

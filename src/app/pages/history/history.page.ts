@@ -1,6 +1,6 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonHeader,
   IonToolbar,
@@ -56,11 +56,19 @@ import { Workout } from '../../core/models/workout.model';
   ],
   templateUrl: './history.page.html',
 })
-export class HistoryPage {
+export class HistoryPage implements OnInit {
   private readonly data = inject(DataService);
   private readonly sync = inject(SyncService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly alertCtrl = inject(AlertController);
+
+  /** Honour the PWA "Start workout" shortcut (?new=1) by starting a session. */
+  ngOnInit(): void {
+    if (this.route.snapshot.queryParamMap.get('new') === '1') {
+      void this.startWorkout();
+    }
+  }
 
   readonly workouts = this.data.workouts;
   readonly syncStatus = this.sync.status;

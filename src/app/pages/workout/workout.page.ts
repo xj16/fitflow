@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -56,6 +56,7 @@ import {
   standalone: true,
   imports: [
     DecimalPipe,
+    DatePipe,
     FormsModule,
     IonHeader,
     IonToolbar,
@@ -148,6 +149,54 @@ export class WorkoutPage {
     if (w && (unit === 'kg' || unit === 'lb')) {
       void this.data.updateWorkout(w.id, { unit: unit as WeightUnit });
     }
+  }
+
+  /**
+   * Edit the session date so users can back-date or fix a logged workout
+   * (the date is otherwise frozen at creation). Uses a native datetime-local
+   * input inside an alert; the time-of-day is preserved when only the day
+   * changes, and an invalid entry is ignored.
+   */
+  async editDate(): Promise<void> {
+    const w = this.workout();
+    if (!w) {
+      return;
+    }
+    const alert = await this.alertCtrl.create({
+      header: 'Session date & time',
+      inputs: [
+        {
+          name: 'date',
+          type: 'datetime-local',
+          value: toLocalInput(w.date),
+        },
+      ],
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Save',
+          handler: (val: { date: string }) => {
+            const parsed = val.date ? new Date(val.date) : null;
+            if (parsed && !isNaN(parsed.getTime())) {
+              void this.data.updateWorkout(w.id, { date: parsed.toISOString() });
+            }
+          },
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  /** Human-readable session duration, e.g. "58 min", or empty if untracked. */
+  durationLabel(): string {
+    const w = this.workout();
+    if (!w?.durationSec || w.durationSec <= 0) {
+      return '';
+    }
+    const min = Math.round(w.durationSec / 60);
+    return min >= 60
+      ? `${Math.floor(min / 60)}h ${min % 60}m`
+      : `${min} min`;
   }
 
   async addExercise(): Promise<void> {
@@ -251,4 +300,17 @@ export class WorkoutPage {
   bumpRest(delta: number): void {
     this.restSeconds.update((s) => Math.max(15, Math.min(600, s + delta)));
   }
+}
+
+/** Convert an ISO timestamp to a `datetime-local` input value (local tz). */
+function toLocalInput(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) {
+    return '';
+  }
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  return (
+    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` +
+    `T${pad(d.getHours())}:${pad(d.getMinutes())}`
+  );
 }

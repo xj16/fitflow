@@ -1,5 +1,10 @@
 @if (hasData()) {
-  <svg [attr.viewBox]="viewBox" class="mini-chart" preserveAspectRatio="none">
+  <svg
+    [attr.viewBox]="viewBox"
+    class="mini-chart"
+    preserveAspectRatio="none"
+    (pointerleave)="setActive(null)"
+  >
     <defs>
       <linearGradient [attr.id]="'grad-' + color()" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" [attr.stop-color]="color()" stop-opacity="0.35" />
@@ -21,6 +26,7 @@
       @for (c of coords(); track $index) {
         <circle
           class="dot"
+          [class.active]="activeIndex() === $index"
           [attr.cx]="c.x"
           [attr.cy]="c.y"
           r="2.5"
@@ -31,6 +37,7 @@
       @for (b of bars(); track $index) {
         <rect
           class="bar"
+          [class.active]="activeIndex() === $index"
           [attr.x]="b.x"
           [attr.y]="b.y"
           [attr.width]="b.w"
@@ -40,7 +47,46 @@
         ></rect>
       }
     }
+
+    <!-- Active-point vertical guide + marker. -->
+    @if (activeCoord(); as ac) {
+      <line
+        class="guide"
+        [attr.x1]="ac.x"
+        [attr.y1]="0"
+        [attr.x2]="ac.x"
+        [attr.y2]="height_"
+        [attr.stroke]="color()"
+      ></line>
+      <circle
+        class="marker"
+        [attr.cx]="ac.x"
+        [attr.cy]="ac.y"
+        r="4"
+        [attr.fill]="color()"
+      ></circle>
+    }
+
+    <!-- Invisible per-point hit targets for hover / tap tooltips. -->
+    @for (c of coords(); track $index) {
+      <rect
+        class="hit"
+        [attr.x]="c.x - hitHalf()"
+        [attr.y]="0"
+        [attr.width]="hitHalf() * 2"
+        [attr.height]="height_"
+        (pointerenter)="setActive($index)"
+        (pointerdown)="setActive($index)"
+      ></rect>
+    }
   </svg>
+
+  @if (activeCoord(); as ac) {
+    <div class="chart-tooltip" [style.left.%]="(tooltipX() / width_) * 100">
+      <strong>{{ ac.value | number: '1.0-1' }}{{ unit() }}</strong>
+      <span>{{ ac.label }}</span>
+    </div>
+  }
 } @else {
   <div class="chart-empty">Not enough data yet</div>
 }

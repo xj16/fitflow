@@ -71,3 +71,37 @@ begin
       for all using (true) with check (true);
   end if;
 end $$;
+
+-- ============================================================================
+-- MULTI-USER / MULTI-DEVICE VARIANT (copy-paste to tighten the demo above)
+-- ============================================================================
+--
+-- The anon-full-access policies above are appropriate ONLY for a single-user,
+-- self-hosted project. For a shared project where each person signs in (so one
+-- key can't read another user's data), scope every row to the authenticated
+-- user. This is a drop-in tightening because the client already sends a
+-- per-record UUID `id`; here we add a `user_id` column that defaults to the
+-- caller's `auth.uid()` and scope all policies to it.
+--
+-- To adopt it: run `see_multi_user.sql` steps below INSTEAD of the anon
+-- policies (drop those first), and have the app sign the user in so the
+-- Supabase client sends a real JWT. (FitFlow's client uses the anon key with
+-- `persistSession:false`; wiring email/OAuth sign-in is a small follow-up.)
+--
+--   -- 1. Add an owner column defaulting to the caller.
+--   alter table public.workouts  add column if not exists user_id uuid default auth.uid();
+--   alter table public.exercises add column if not exists user_id uuid default auth.uid();
+--   alter table public.routines  add column if not exists user_id uuid default auth.uid();
+--
+--   -- 2. Index it for fast per-user delta queries.
+--   create index if not exists workouts_user_idx  on public.workouts  (user_id, updated_at);
+--   create index if not exists exercises_user_idx on public.exercises (user_id, updated_at);
+--   create index if not exists routines_user_idx  on public.routines  (user_id, updated_at);
+--
+--   -- 3. Replace the anon policies with owner-scoped ones (example: workouts).
+--   drop policy if exists anon_all_workouts on public.workouts;
+--   create policy own_workouts on public.workouts
+--     for all
+--     using (user_id = auth.uid())
+--     with check (user_id = auth.uid());
+--   -- ...repeat for exercises and routines.
