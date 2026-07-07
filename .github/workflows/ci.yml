@@ -18,7 +18,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [20, 22]
+        # Angular 22 (CLI + @angular/build) requires Node >=22, and several
+        # deps (@supabase/*, listr2) declare the same engine floor. Node 20 is
+        # unsupported by this toolchain, so we only test on supported LTS lines.
+        node: [22, 24]
 
     steps:
       - name: Checkout
